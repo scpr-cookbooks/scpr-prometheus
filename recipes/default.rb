@@ -12,3 +12,8 @@ directory node.scpr_prometheus.data_dir do
   recursive true
   owner     node.scpr_prometheus.user
 end
+
+# Register all node exporters
+prometheus_job "node-exporter" do
+  sd_name "prometheus-node-exporter.service.consul"
+end
