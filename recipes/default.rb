@@ -17,3 +17,8 @@ end
 prometheus_job "node-exporter" do
   sd_name "prometheus-node-exporter.service.consul"
 end
+
+# Register haproxy exporters
+prometheus_job "haproxy-exporter" do
+  sd_name "prometheus-haproxy-exporter.service.consul"
+end
