@@ -6,3 +6,4 @@ include_attribute "prometheus"
 default['prometheus']['init_style']                   = "sysv"
 default['prometheus']['flags']['storage.local.path']  = node.scpr_prometheus.data_dir
 default['prometheus']['source']['user']               = node.scpr_prometheus.user
+default['prometheus']['allow_external_config']        = true

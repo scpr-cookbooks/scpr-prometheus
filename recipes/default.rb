@@ -13,17 +13,27 @@ directory node.scpr_prometheus.data_dir do
   owner     node.scpr_prometheus.user
 end
 
-# Register all node exporters
-prometheus_job "node-exporter" do
-  sd_name "prometheus-node-exporter.service.consul"
+# -- Install consul template -- #
+
+include_recipe "consul-template"
+
+# -- Write our config template -- #
+
+template "#{node['prometheus']['flags']['config.file']}.tmplt" do
+  action    :create
+  source    "prometheus.conf.tmplt.erb"
+  notifies  :reload, "service[consul-template]"
 end
 
-# Register haproxy exporters
-prometheus_job "haproxy-exporter" do
-  sd_name "prometheus-haproxy-exporter.service.consul"
-end
-
-# Register consul exporter
-prometheus_job "consul-exporter" do
-  sd_name "prometheus-consul-exporter.service.consul"
+# Set up our consul template config
+consul_template_config "prometheus-config" do
+  action :create
+  templates([
+    {
+      source:       "#{node['prometheus']['flags']['config.file']}.tmplt",
+      destination:  "#{node['prometheus']['flags']['config.file']}",
+      command:      "service prometheus restart",
+    }
+  ])
+  notifies :restart, "service[consul-template]"
 end

@@ -1,0 +1,17 @@
+# Global default settings.
+global {
+  scrape_interval: "{{ key "prometheus/scrape_interval" }}"
+  evaluation_interval: "{{ key "prometheus/evaluation_interval" }}"
+
+  # Load and evaluate rules in this file every 'evaluation_interval' seconds. This field may be repeated.
+  #rule_file: "prometheus.rules"
+}
+
+{{range ls "prometheus/exporters" }}
+job: {
+  name: "{{.Key}}"
+  target_group: { {{ range service .Value "any"}}
+    target: "http://{{.Node}}.node.consul:{{.Port}}/metrics"{{end}}
+  }
+}
+{{end}}
